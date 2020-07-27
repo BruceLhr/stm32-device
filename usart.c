@@ -35,7 +35,7 @@ void uart_init(u32 bound){ //115200
 }
 
 void USART1_IRQHandler(void) //enter is 0x0d 0x0a in windows system
-	{
+{
 	u8 Res;
 	if(USART_GetITStatus(USART1, USART_IT_RXNE) != RESET)  
 		{
@@ -60,4 +60,20 @@ void USART1_IRQHandler(void) //enter is 0x0d 0x0a in windows system
 				}
 			}   		 
 		} 
-	}
+}
+	
+int fputc(int ch, FILE *f)
+{      
+	while((USART1->SR&0X40)==0);//循环发送,直到发送完毕   
+    USART1->DR = (u8) ch;      
+	return ch;
+}
+
+int fputc(int ch, FILE *f)
+{
+	USART_SendData(USART1, (uint8_t) ch);
+
+	while (USART_GetFlagStatus(USART1, USART_FLAG_TC) == RESET) {}	
+   
+    return ch;
+}
